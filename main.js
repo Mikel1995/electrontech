@@ -1,19 +1,67 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow, dialog, globalShortcut, Menu, MenuItem, Tray } = require('electron')
+
+// Window state keeper 
+
+const windowStateKeeper = require('electron-window-state');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
-function createWindow () {
+// Creating my Menu
+
+let mainMenu = new Menu();
+
+let menuItem = Menu.buildFromTemplate(require('./mainMenu.js'))
+let contextMenu = Menu.buildFromTemplate(require('./contextMenu.js'))
+
+// mainMenu.append(menuItem)
+
+function createTray() {
+  tray = new Tray('icon.png');
+  tray.setToolTip('Stackacademy.tv');
+
+  const trayMenu = Menu.buildFromTemplate([
+    {
+      label: 'Hide/Show',
+      click: () => {
+        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+      }
+    },
+    { role: 'quit' }
+  ])
+
+  tray.setContextMenu(trayMenu);
+}
+
+
+function createWindow() {
+
+  let winState = windowStateKeeper({
+    defaultWidth: 1200,
+    defaultHeight: 600
+  })
+
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({ width: winState.width, height: winState.height, x: winState.x, y: winState.y })
+
+  winState.manage(mainWindow);
+
+  mainWindow.webContents.on('context-menu', (e) => {
+    e.preventDefault();
+    contextMenu.popup();
+  })
+
+
 
   // and load the index.html of the app.
+  // mainWindow.loadFile('index.html')
   mainWindow.loadFile('index.html')
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  globalShortcut.register('F11', () => {
+    console.log(mainWindow.webContents.openDevTools());
+  })
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -27,7 +75,11 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow();
+  Menu.setApplicationMenu(menuItem);
+  createTray();
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

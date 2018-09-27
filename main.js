@@ -1,13 +1,20 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, dialog, globalShortcut, Menu, MenuItem, Tray } = require('electron')
+const { app, BrowserWindow, globalShortcut, Menu, Tray, ipcMain } = require('electron')
+
+require('electron-reload')(__dirname);
 
 // Window state keeper 
-
 const windowStateKeeper = require('electron-window-state');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+
+ipcMain.on('channel1', (e, args) => {
+  console.log(args);
+  e.sender.send('channel1', 'Message recived on the main process')
+})
+
 
 // Creating my Menu
 

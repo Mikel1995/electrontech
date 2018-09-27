@@ -1,16 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Rammstein Test!!</h1>
-    <p>Press F11 to open DevTools</p>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World!</title>
+</head>
+
+<body>
+  <div>
+    <h1>Rammstein Test!!</h1> <a href="https://www.rammstein.de/" target="_blank">Visit site</a>
     <textarea name="" id="" cols="30" rows="10"></textarea>
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
-    </script>
-  </body>
+  </div>
+  <hr>
+  <div>
+    <img src="icon.png" alt="" srcset="">
+    <button id="zoom_up">Increase Zoom</button>
+    <button id="zoom_down">Decrease Zoom</button>
+    <button id="zoom_reset">Reset Zoom</button>
+  </div>
+  <div>
+    <label for="name">Run Js code here</label>
+    <textarea id="jscode" name="name" id="" cols="30" rows="10"></textarea>
+    <button id="run_js">Run Js Code</button>
+  </div>
+  <script>
+    const { webFrame } = require('electron')
+
+    let zoom = 0
+
+    document.getElementById('zoom_up').addEventListener('click', () => {
+      webFrame.setZoomLevel(++zoom)
+    })
+
+    document.getElementById('zoom_down').addEventListener('click', () => {
+      webFrame.setZoomLevel(--zoom)
+    })
+
+    document.getElementById('zoom_reset').addEventListener('click', () => {
+      webFrame.setZoomLevel(zoom = 0)
+    })
+
+    document.getElementById('run_js').addEventListener('click', () => {
+      let code = document.getElementById("jscode").value
+      webFrame.executeJavaScript(code);
+    })
+
+
+  </script>
+</body>
+
 </html>
